@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 const CONVERSATION_DURATION = 60; // 1 minute in seconds
 
+const API_URL = 'https://real-time-ai-conversation-image-1-minute-child-inter-ggcaqggk4.vercel.app';
+
 function ConversationPanel({ 
   sessionId, 
   image, 
@@ -104,7 +106,7 @@ function ConversationPanel({
 
     try {
       console.log('Fetching from /api/conversation/start');
-      const response = await fetch('/api/conversation/start', {
+      const response = await fetch(`${API_URL}/api/conversation/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -157,7 +159,7 @@ function ConversationPanel({
     }
 
     try {
-      const response = await fetch('/api/conversation/continue', {
+      const response = await fetch(`${API_URL}/api/conversation/continue`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
