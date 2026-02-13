@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import OpenAI from 'openai';
+import Groq from 'groq-sdk';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -9,8 +9,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || 'your-api-key-here',
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
+
+// Initialize Groq client
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 // Store conversation sessions
@@ -63,46 +70,65 @@ const tools = [
 app.post('/api/conversation/start', async (req, res) => {
   const { imageDescription, sessionId } = req.body;
   
-  const systemPrompt = `You are a friendly, enthusiastic AI companion having a voice conversation with a child (ages 5-10). 
+  const systemPrompt = `You are Sparkle, a magical, enthusiastic AI friend having a voice conversation with a child (ages 5-10). 
 
 The child is looking at an image: "${imageDescription}"
 
-Your role:
-- Start the conversation by greeting the child warmly and asking an engaging question about the image
-- Keep responses short (1-2 sentences) for easy listening
-- Be playful, encouraging, and patient
-- Ask follow-up questions to keep the conversation flowing
-- Use tool calls to celebrate achievements and highlight image parts when appropriate
-- Wrap up the conversation after about 1 minute (you'll get a signal)
+Your personality:
+- You're energetic, warm, and genuinely excited to talk with the child
+- Use playful language, occasional sound effects (like "Ooh!", "Wow!", "Yay!")
+- Give specific, enthusiastic praise when they share something interesting
+- Remember what they said and reference it in follow-up questions
+- Use the child's name if they share it
 
-Tone: Warm, curious, like a fun older friend. Use simple language.`;
+Conversation style:
+- Keep responses SHORT (1-2 sentences max) - children have short attention spans
+- Ask ONE clear question at a time
+- React with genuine enthusiasm to their answers
+- Use phrases like "That's amazing!", "What a great observation!", "I love how you think!"
+- If they seem stuck, give gentle hints or multiple choice options
+
+Engagement techniques:
+- Celebrate their creativity and imagination
+- Ask "what if" questions to spark imagination
+- Connect image elements to their experiences ("Have you ever seen...?")
+- Use their previous answers to build the next question
+
+Tone: Like a fun camp counselor or favorite babysitter - warm, patient, endlessly curious.
+
+IMPORTANT: You have 1 minute total. Make every exchange count with genuine engagement!`;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+    const response = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: 'Start the conversation!' }
       ],
-      tools: tools,
-      tool_choice: 'auto',
+      temperature: 0.7,
+      max_tokens: 150,
     });
+
+    const assistantMessage = {
+      role: 'assistant',
+      content: response.choices[0].message.content
+    };
 
     sessions.set(sessionId, {
       messages: [
         { role: 'system', content: systemPrompt },
-        response.choices[0].message
+        assistantMessage
       ],
       startTime: Date.now(),
     });
 
     res.json({
-      message: response.choices[0].message,
+      message: assistantMessage,
       sessionId,
     });
   } catch (error) {
-    console.error('Error starting conversation:', error);
-    res.status(500).json({ error: 'Failed to start conversation' });
+    console.error('Error starting conversation:', error.message);
+    res.status(500).json({ error: 'Failed to start conversation', details: error.message });
   }
 });
 
@@ -126,14 +152,18 @@ app.post('/api/conversation/continue', async (req, res) => {
   session.messages.push({ role: 'user', content: userMessage + timeContext });
 
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+    const response = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
       messages: session.messages,
-      tools: tools,
-      tool_choice: 'auto',
+      temperature: 0.7,
+      max_tokens: 150,
     });
 
-    const assistantMessage = response.choices[0].message;
+    const assistantMessage = {
+      role: 'assistant',
+      content: response.choices[0].message.content
+    };
+    
     session.messages.push(assistantMessage);
 
     res.json({
@@ -153,7 +183,26 @@ app.post('/api/conversation/end', (req, res) => {
   res.json({ success: true });
 });
 
+// Health check - verify API key
+app.get('/api/health', async (req, res) => {
+  try {
+    const response = await groq.models.list();
+    res.json({ 
+      status: 'ok', 
+      message: 'Groq API key is valid',
+      models_available: response.data.length 
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: 'error', 
+      message: 'Groq API key invalid',
+      error: error.message 
+    });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log('🚀 Using Groq AI (Llama 3.1) - Fast & Free Tier Available');
 });

@@ -6,15 +6,49 @@
 
 body {
   font-family: 'Nunito', sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
   min-height: 100vh;
   color: #333;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Floating particles background */
+.app::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.3) 2px, transparent 2px),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.3) 2px, transparent 2px),
+    radial-gradient(circle at 40% 40%, rgba(255,255,255,0.2) 1px, transparent 1px),
+    radial-gradient(circle at 60% 60%, rgba(255,255,255,0.2) 1px, transparent 1px);
+  background-size: 100px 100px, 150px 150px, 80px 80px, 120px 120px;
+  animation: floatParticles 20s linear infinite;
+  z-index: 0;
+}
+
+@keyframes floatParticles {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(-100px) rotate(360deg); }
 }
 
 .app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 .app-header {
@@ -28,6 +62,12 @@ body {
   font-weight: 800;
   margin-bottom: 0.5rem;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
 }
 
 .app-header p {
@@ -59,9 +99,23 @@ body {
 
 .image-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
   justify-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .image-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .image-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .image-card {
@@ -71,13 +125,30 @@ body {
   border-radius: 20px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  transform-style: preserve-3d;
 }
 
 .image-card:hover {
-  transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  transform: translateY(-15px) rotateX(5deg) scale(1.03);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+}
+
+.image-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s;
+  z-index: 1;
+}
+
+.image-card:hover::before {
+  left: 100%;
 }
 
 .image-card img {
@@ -347,11 +418,12 @@ body {
 
 .timer-bar {
   position: relative;
-  height: 40px;
-  background: #f0f0f0;
+  height: 45px;
+  background: linear-gradient(90deg, #f0f0f0 0%, #e8e8e8 100%);
   display: flex;
   align-items: center;
   padding: 0 1rem;
+  overflow: hidden;
 }
 
 .timer-progress {
@@ -359,15 +431,24 @@ body {
   left: 0;
   top: 0;
   bottom: 0;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
   transition: width 1s linear;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .timer-text {
   position: relative;
   z-index: 1;
-  font-weight: 700;
+  font-weight: 800;
+  font-size: 1.1rem;
   color: #333;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.8);
 }
 
 .messages-container {
@@ -409,20 +490,36 @@ body {
   align-items: flex-start;
   gap: 0.5rem;
   max-width: 80%;
-  padding: 0.8rem 1rem;
-  border-radius: 15px;
+  padding: 1rem 1.2rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.message-bubble:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
 }
 
 .message.user .message-bubble {
-  background: #667eea;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border-bottom-right-radius: 5px;
 }
 
 .message.assistant .message-bubble {
-  background: #f0f0f0;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
   color: #333;
   border-bottom-left-radius: 5px;
+}
+
+.message.assistant .message-bubble::before {
+  content: '🤖 Sparkle';
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 0.3rem;
 }
 
 .message-icon {
@@ -574,4 +671,169 @@ body {
 
 .messages-container::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1rem 1.2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+  border-radius: 20px;
+  border-bottom-left-radius: 5px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  width: fit-content;
+}
+
+.typing-indicator .dot {
+  width: 8px;
+  height: 8px;
+  background: #667eea;
+  border-radius: 50%;
+  animation: typingBounce 1.4s ease-in-out infinite;
+}
+
+.typing-indicator .dot:nth-child(1) { animation-delay: 0s; }
+.typing-indicator .dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator .dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-10px); }
+}
+
+/* AI Avatar Animation */
+.ai-avatar {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  animation: avatarBounce 2s ease-in-out infinite;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+@keyframes avatarBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-10px) scale(1.05); }
+}
+
+.ai-avatar.speaking {
+  animation: avatarSpeak 0.5s ease-in-out infinite;
+}
+
+@keyframes avatarSpeak {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Page Transitions */
+.welcome-screen {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.conversation-container {
+  animation: fadeInScale 0.5s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Sparkle Animation for Celebrations */
+.sparkle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #FFD93D;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  animation: sparkleRotate 2s linear infinite;
+}
+
+@keyframes sparkleRotate {
+  0% { transform: rotate(0deg) scale(0); opacity: 0; }
+  50% { transform: rotate(180deg) scale(1); opacity: 1; }
+  100% { transform: rotate(360deg) scale(0); opacity: 0; }
+}
+
+/* Wave Animation for Voice */
+.wave-container {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 30px;
+}
+
+.wave-bar {
+  width: 4px;
+  background: linear-gradient(to top, #667eea, #764ba2);
+  border-radius: 2px;
+  animation: wave 1s ease-in-out infinite;
+}
+
+.wave-bar:nth-child(1) { animation-delay: 0s; height: 20%; }
+.wave-bar:nth-child(2) { animation-delay: 0.1s; height: 40%; }
+.wave-bar:nth-child(3) { animation-delay: 0.2s; height: 60%; }
+.wave-bar:nth-child(4) { animation-delay: 0.3s; height: 40%; }
+.wave-bar:nth-child(5) { animation-delay: 0.4s; height: 20%; }
+
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.5); }
+  50% { transform: scaleY(1); }
+}
+
+/* Button Hover Effects */
+.select-btn, .start-btn, .restart-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.select-btn::after, .start-btn::after, .restart-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.select-btn:hover::after, .start-btn:hover::after, .restart-btn:hover::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* Glowing Effect for Active Elements */
+.glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 5px #667eea, 0 0 10px #667eea, 0 0 15px #667eea; }
+  to { box-shadow: 0 0 10px #764ba2, 0 0 20px #764ba2, 0 0 30px #764ba2; }
 }

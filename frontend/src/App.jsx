@@ -23,6 +23,42 @@ const IMAGES = [
     url: 'https://images.unsplash.com/photo-1535572290543-960a8046f5af?w=800&auto=format&fit=crop',
     description: 'An underwater castle made of coral with mermaids, seahorses, and glowing jellyfish creating a magical ocean kingdom',
     title: 'Ocean Kingdom'
+  },
+  {
+    id: 4,
+    url: 'https://images.unsplash.com/photo-1560167016-022b78a0258e?w=800&auto=format&fit=crop',
+    description: 'A colorful hot air balloon floating over a candy land with lollipop trees, chocolate rivers, and marshmallow clouds',
+    title: 'Candy Land Journey'
+  },
+  {
+    id: 5,
+    url: 'https://images.unsplash.com/photo-1545153976-cc7565d4f6e5?w=800&auto=format&fit=crop',
+    description: 'A majestic dragon guarding a treasure chest full of glowing gems in a crystal cave with rainbow waterfalls',
+    title: 'Dragon Treasure Cave'
+  },
+  {
+    id: 6,
+    url: 'https://images.unsplash.com/photo-1518495973542-7d99477f6b56?w=800&auto=format&fit=crop',
+    description: 'A magical treehouse village high in the clouds with rope bridges, friendly birds, and children playing among fluffy clouds',
+    title: 'Cloud Treehouse Village'
+  },
+  {
+    id: 7,
+    url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&auto=format&fit=crop',
+    description: 'A snowy winter wonderland with friendly polar bears, penguins wearing scarves, and an igloo village under the northern lights',
+    title: 'Winter Wonderland'
+  },
+  {
+    id: 8,
+    url: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800&auto=format&fit=crop',
+    description: 'A magical garden with giant flowers, talking butterflies, friendly ladybugs, and a hidden fairy door at the base of a sunflower',
+    title: 'Enchanted Garden'
+  },
+  {
+    id: 9,
+    url: 'https://images.unsplash.com/photo-1535581652167-3d6b98c36bb2?w=800&auto=format&fit=crop',
+    description: 'A superhero training academy with kids wearing capes, obstacle courses, and a friendly robot helper giving high-fives',
+    title: 'Superhero Academy'
   }
 ];
 

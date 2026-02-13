@@ -100,8 +100,10 @@ function ConversationPanel({
   const startConversation = async () => {
     onStart();
     setIsProcessing(true);
+    console.log('Starting conversation...', { sessionId, imageDescription: image.description });
 
     try {
+      console.log('Fetching from /api/conversation/start');
       const response = await fetch('/api/conversation/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -110,8 +112,15 @@ function ConversationPanel({
           imageDescription: image.description
         })
       });
+      
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
+      console.log('Response data:', data);
       
       if (data.message) {
         const content = data.message.content;
@@ -132,6 +141,7 @@ function ConversationPanel({
       }
     } catch (error) {
       console.error('Error starting conversation:', error);
+      setMessages([{ role: 'assistant', content: 'Oops! Something went wrong. Please try again! 🔧' }]);
       setIsProcessing(false);
     }
   };
